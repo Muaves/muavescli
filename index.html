@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muaves - Download Portfolio</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+        background-color: #f0f0f0;
+    }
+    .h1 {
+        color: #333;
+    }
+    .download-status {
+        color: #27ae60;
+        font-weight: bold;
+        margin-top: 20px;
+        display: none;
+    }
+</style>
+<body>
+    <h1 class="h1">Downloading Muaves Portfolio v1.0.4...</h1>
+    <p><b><mark><ins>You just need to wait a few seconds</ins></mark></b> for the download to start automatically.</p>
+    <p class="download-status" id="downloadStatus" title="Or mybe finished!">✓ Download started!</p>
+    
+    <script>
+        setTimeout(function() {
+            document.getElementById('downloadStatus').style.display = 'block';
+            const downloadLink = 'https://github.com/Muaves/muavescli/raw/refs/heads/main/muaves-portfolio-v1.0.4.zip';
+            const link = document.createElement('a');
+            link.href = downloadLink;
+            link.download = 'muaves-portfolio-v1.0.4.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }, 4000);
+    </script>
+</body>
+</html>
