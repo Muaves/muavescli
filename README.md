@@ -1,5 +1,7 @@
 # Muaves Portfolio CLI v1.0.4
-
+![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/code/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/Modrinth/code?color=c78aff&label=commits&style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/Modrinth/code?color=c78aff&label=last%20commit&style=for-the-badge)
 A command-line interface to showcase your portfolio with style! 🚀
 
 ## Quick Start
