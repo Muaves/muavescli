@@ -1,8 +1,8 @@
 # Muaves Portfolio CLI v1.0.4
-![Issues](https://img.shields.io/github/issues/Muaves/muavescli?style=for-the-badge&color=0094C6)
-![Commits](https://img.shields.io/github/commits-since/Muaves/muavescli/v1.0.4?style=for-the-badge&color=bf94ff&label=COMMITS)
-![Size](https://img.shields.io/github/repo-size/Muaves/muavescli?style=for-the-badge&color=bf94ff&label=SIZE)
-![Last Commit](https://img.shields.io/github/last-commit/Muaves/muavescli?style=for-the-badge&color=bf94ff)
+![Issues](https://img.shields.io/github/issues/Muaves/muavescli?style=for-the-badge&color=000022)
+![Commits](https://img.shields.io/github/commits-since/Muaves/muavescli/v1.0.4?style=for-the-badge&color=001242&label=COMMITS)
+![Size](https://img.shields.io/github/repo-size/Muaves/muavescli?style=for-the-badge&color=0094C6&label=SIZE)
+![Last Commit](https://img.shields.io/github/last-commit/Muaves/muavescli?style=for-the-badge&color=005E7C)
 
 A command-line interface to showcase your portfolio with style! 🚀
 
