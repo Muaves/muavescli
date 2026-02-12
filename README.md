@@ -62,6 +62,24 @@ muaves-portfolio/
 - Python 3.6 or higher
 - No external dependencies (uses only Python standard library)
 
+## Troubleshooting
+A known error that if you download it twice or more times it becomes useless!
+So here you go how to solve it:
+
+### Step 1: Delete the Files
+Depending on where you installed it, you need to remove the copied files:
+
+### For Linux/macOS (Option 1 - Local):
+Open your terminal and run:
+'rm ~/.local/bin/muaves ~/.local/bin/muaves.py ~/.local/bin/portfolio_data.json'
+
+### For Linux (Option 2 - System-wide):
+Run:
+'sudo rm /usr/local/bin/muaves /usr/local/bin/muaves.py /usr/local/bin/portfolio_data.json'
+
+### For Windows:
+Simply delete the folder where you extracted the ZIP file. The Windows installer (install.bat) doesn't copy files elsewhere; it just tells the system where that specific folder is.
+
 ## License
 
 You are free to use this work for personal or commercial purposes, but you may not modify, adapt, or create derivative works based on it.
