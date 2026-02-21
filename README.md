@@ -88,7 +88,7 @@ See LICENSE file for details.
 
 ## Version
 
-Current version: 1.0.4
+Current version: 1.0.6
 
 ---
 
