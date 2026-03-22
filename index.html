@@ -1,43 +1,881 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muaves - Download Portfolio</title>
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>muaves — portfolio in bash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 20px;
-        background-color: #f0f0f0;
-    }
-    .h1 {
-        color: #333;
-    }
-    .download-status {
-        color: #27ae60;
-        font-weight: bold;
-        margin-top: 20px;
-        display: none;
-    }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0b;
+  --bg2:#111114;
+  --bg3:#18181d;
+  --surface:#1e1e24;
+  --border:#2a2a35;
+  --border2:#35353f;
+  --accent:#4f8cff;
+  --accent2:#7c5cfc;
+  --accent3:#00e5a0;
+  --text:#e8e8f0;
+  --muted:#6b6b80;
+  --muted2:#4a4a5a;
+  --green:#00e5a0;
+  --yellow:#f0c040;
+  --red:#ff5566;
+  --cyan:#00c8f0;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+::selection{background:rgba(79,140,255,.3);color:var(--text)}
+a{color:inherit;text-decoration:none}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:56px;
+  background:rgba(10,10,11,.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:18px;
+  letter-spacing:-0.02em;
+  color:var(--text);
+}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{
+  font-size:13px;font-weight:500;color:var(--muted);
+  transition:color .2s;letter-spacing:.02em;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-dl{
+  background:var(--accent);
+  color:#fff;
+  padding:7px 18px;
+  border-radius:6px;
+  font-size:13px;font-weight:600;
+  transition:background .2s,transform .15s;
+  cursor:pointer;border:none;
+  font-family:'JetBrains Mono',monospace;
+}
+.nav-dl:hover{background:#3a76e8;transform:translateY(-1px)}
+
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:80px 24px 60px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(79,140,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,140,255,.04) 1px,transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 30%,transparent 100%);
+}
+.hero-glow{
+  position:absolute;
+  width:700px;height:500px;
+  background:radial-gradient(ellipse,rgba(79,140,255,.08) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.hero-content{position:relative;text-align:center;max-width:760px}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--border2);
+  background:var(--bg2);
+  padding:5px 14px;border-radius:100px;
+  font-size:12px;color:var(--muted);
+  margin-bottom:36px;letter-spacing:.04em;
+}
+.hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(42px,7vw,80px);
+  font-weight:800;line-height:1.05;
+  letter-spacing:-0.03em;
+  margin-bottom:24px;
+}
+h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{
+  font-size:16px;color:var(--muted);
+  max-width:480px;margin:0 auto 48px;
+  line-height:1.7;font-weight:300;
+}
+.hero-sub code{
+  color:var(--accent3);background:rgba(0,229,160,.08);
+  padding:1px 6px;border-radius:4px;font-size:14px;
+}
+.btn-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.btn-primary{
+  display:flex;align-items:center;gap:8px;
+  background:var(--accent);color:#fff;
+  padding:12px 24px;border-radius:8px;
+  font-size:14px;font-weight:600;
+  transition:all .2s;cursor:pointer;border:none;
+  font-family:'JetBrains Mono',monospace;
+}
+.btn-primary:hover{background:#3a76e8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,140,255,.3)}
+.btn-secondary{
+  display:flex;align-items:center;gap:8px;
+  background:transparent;color:var(--text);
+  padding:12px 24px;border-radius:8px;
+  font-size:14px;font-weight:600;
+  border:1px solid var(--border2);
+  transition:all .2s;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;
+}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.btn-icon{font-size:16px}
+.hero-note{font-size:12px;color:var(--muted2);margin-top:4px}
+.hero-note a{color:var(--muted);border-bottom:1px solid var(--border2);transition:color .2s}
+.hero-note a:hover{color:var(--accent)}
+
+.terminal-wrap{
+  position:relative;margin-top:64px;
+  width:100%;max-width:860px;
+}
+.terminal-window{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+}
+.terminal-bar{
+  background:var(--bg3);
+  padding:12px 16px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border);
+}
+.tbar-dots{display:flex;gap:6px}
+.tbar-dot{
+  width:12px;height:12px;border-radius:50%;
+  cursor:pointer;transition:opacity .2s;
+}
+.tbar-dot:hover{opacity:.7}
+.tbar-dot.red{background:#ff5f56}
+.tbar-dot.yellow{background:#ffbd2e}
+.tbar-dot.green{background:#27c93f}
+.tbar-title{
+  flex:1;text-align:center;
+  font-size:12px;color:var(--muted);letter-spacing:.04em;
+}
+.terminal-body{
+  padding:20px 24px;
+  min-height:320px;
+  font-size:13.5px;line-height:1.8;
+  font-family:'JetBrains Mono',monospace;
+  position:relative;
+}
+.t-line{display:flex;gap:8px;flex-wrap:wrap}
+.t-prompt{color:var(--accent3);user-select:none}
+.t-path{color:var(--accent);user-select:none}
+.t-cmd{color:var(--text)}
+.t-output{color:var(--muted);padding-left:0;white-space:pre-wrap}
+.t-green{color:var(--green)}
+.t-yellow{color:var(--yellow)}
+.t-cyan{color:var(--cyan)}
+.t-accent{color:var(--accent)}
+.t-muted{color:var(--muted2)}
+.t-blank{height:8px}
+.cursor{
+  display:inline-block;width:8px;height:16px;
+  background:var(--text);
+  animation:blink 1.1s step-end infinite;
+  vertical-align:middle;margin-left:2px;
+}
+@keyframes blink{50%{opacity:0}}
+
+.interactive-terminal{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 40px 80px rgba(0,0,0,.5);
+}
+.interactive-terminal .terminal-body{min-height:380px;max-height:440px;overflow-y:auto}
+.t-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 24px;
+  border-top:1px solid var(--border);
+  background:var(--bg3);
+}
+.t-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:13.5px;caret-color:var(--accent3);
+}
+.t-submit{
+  background:var(--accent);color:#fff;border:none;
+  padding:5px 14px;border-radius:5px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:background .2s;
+}
+.t-submit:hover{background:#3a76e8}
+
+section{padding:100px 48px;max-width:1200px;margin:0 auto}
+.section-label{
+  font-size:11px;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:12px;font-weight:600;
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(28px,4vw,44px);
+  font-weight:800;letter-spacing:-0.02em;
+  margin-bottom:16px;
+}
+.section-sub{font-size:15px;color:var(--muted);max-width:500px;line-height:1.7}
+
+.commands-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;
+  margin-top:52px;
+}
+.cmd-card{
+  background:var(--bg2);
+  padding:24px;
+  transition:background .2s;
+}
+.cmd-card:hover{background:var(--bg3)}
+.cmd-code{
+  font-size:13px;font-weight:600;color:var(--accent3);
+  margin-bottom:10px;letter-spacing:.02em;
+}
+.cmd-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.install-section{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.install-section section{padding:80px 48px}
+.install-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:24px;
+  margin-top:52px;
+}
+.install-card{
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:10px;overflow:hidden;
+}
+.install-card-header{
+  padding:16px 20px;
+  background:var(--bg3);
+  border-bottom:1px solid var(--border);
+  font-size:13px;font-weight:600;letter-spacing:.04em;
+  display:flex;align-items:center;gap:8px;
+}
+.install-card-body{padding:20px}
+.code-block{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:6px;padding:14px 16px;
+  font-size:12.5px;color:var(--muted);
+  line-height:2;
+  white-space:pre;overflow-x:auto;
+}
+.code-block .cmd{color:var(--text)}
+.code-block .comment{color:var(--muted2)}
+.code-block .path{color:var(--accent)}
+.install-step{
+  display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;
+}
+.step-num{
+  width:22px;height:22px;min-width:22px;
+  border-radius:50%;background:var(--accent);
+  color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.step-text{font-size:13px;color:var(--muted);line-height:1.6}
+.step-text code{color:var(--accent3);background:rgba(0,229,160,.06);padding:1px 5px;border-radius:3px}
+
+.dl-section{
+  text-align:center;
+  padding:100px 48px;
+  background:var(--bg);
+  border-top:1px solid var(--border);
+}
+.dl-inner{max-width:600px;margin:0 auto}
+.version-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(0,229,160,.08);border:1px solid rgba(0,229,160,.2);
+  color:var(--green);padding:4px 12px;border-radius:100px;
+  font-size:11px;font-weight:600;letter-spacing:.06em;margin-bottom:24px;
+}
+.dl-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:36px}
+.dl-btn{
+  display:flex;align-items:center;gap:10px;
+  border:1px solid var(--border2);
+  background:var(--bg2);
+  padding:14px 28px;border-radius:8px;
+  font-size:14px;font-weight:600;
+  transition:all .2s;cursor:pointer;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--text);
+}
+.dl-btn:hover{border-color:var(--accent);background:rgba(79,140,255,.08);transform:translateY(-2px)}
+.dl-btn .os-icon{font-size:18px}
+.dl-btn .arrow{color:var(--muted);font-size:12px;transition:transform .2s}
+.dl-btn:hover .arrow{transform:translateX(3px)}
+
+.stats-row{
+  display:flex;gap:0;justify-content:center;
+  border:1px solid var(--border);border-radius:10px;overflow:hidden;
+  margin-top:52px;
+}
+.stat{
+  flex:1;padding:28px;text-align:center;
+  border-right:1px solid var(--border);
+  background:var(--bg2);
+}
+.stat:last-child{border-right:none}
+.stat-num{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
+  color:var(--text);letter-spacing:-0.02em;
+}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
+
+footer{
+  border-top:1px solid var(--border);
+  padding:32px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--muted);
+}
+.footer-brand{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--text)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{color:var(--muted);transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+
+.scroll-fade{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.scroll-fade.visible{opacity:1;transform:none}
+
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  section{padding:60px 20px}
+  .install-grid{grid-template-columns:1fr}
+  .stats-row{flex-direction:column}
+  .stat{border-right:none;border-bottom:1px solid var(--border)}
+  .stat:last-child{border-bottom:none}
+  footer{flex-direction:column;gap:16px;padding:24px 20px;text-align:center}
+  .footer-links{justify-content:center}
+  .dl-section{padding:60px 20px}
+}
 </style>
+</head>
 <body>
-    <h1 class="h1">Downloading Muaves Portfolio v1.0.6...</h1>
-    <p><b><mark><ins>You just need to wait a few seconds</ins></mark></b> for the download to start automatically.</p>
-    <p class="download-status" id="downloadStatus" title="Or mybe finished!">✓ Download started!</p>
-    
-    <script>
-        setTimeout(function() {
-            document.getElementById('downloadStatus').style.display = 'block';
-            const downloadLink = 'https://github.com/Muaves/muavescli/raw/refs/heads/main/muaves-portfolio-v1.0.6.zip';
-            const link = document.createElement('a');
-            link.href = downloadLink;
-            link.download = 'muaves-portfolio-v1.0.6.zip';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }, 4000);
-    </script>
+
+<nav>
+  <div class="nav-brand">muaves<span>cli</span></div>
+  <div class="nav-links">
+    <a href="#commands">Commands</a>
+    <a href="#install">Install</a>
+    <a href="#try">Try it</a>
+    <a href="https://github.com/Muaves/muavescli" target="_blank">GitHub</a>
+  </div>
+  <a href="https://github.com/Muaves/muavescli/releases/tag/v1.0.6" target="_blank">
+    <button class="nav-dl">Download</button>
+  </a>
+</nav>
+
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      v1.0.6 — latest release
+    </div>
+    <h1>Your portfolio,<br>in <em>bash</em>.</h1>
+    <p class="hero-sub">
+      A command-line portfolio experience. Run <code>muaves</code> and browse projects, links, and info — all from the terminal.
+    </p>
+    <div class="btn-row">
+      <a href="https://github.com/Muaves/muavescli/releases/download/v1.0.6/muaves-portfolio-v1.0.6.zip" download>
+        <button class="btn-primary">
+          <span class="btn-icon">↓</span> Download for Windows
+        </button>
+      </a>
+      <a href="https://github.com/Muaves/muavescli/releases/download/v1.0.6/muaves-portfolio-v1.0.6.zip" download>
+        <button class="btn-secondary">
+          <span class="btn-icon">↓</span> Download for Linux
+        </button>
+      </a>
+    </div>
+    <p class="hero-note">
+      <a href="https://github.com/Muaves/muavescli" target="_blank">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://github.com/Muaves/muavescli/releases" target="_blank">All releases</a> &nbsp;·&nbsp;
+      <a href="https://muaves.com" target="_blank">muaves.com</a>
+    </p>
+
+    <div class="terminal-wrap">
+      <div class="terminal-window">
+        <div class="terminal-bar">
+          <div class="tbar-dots">
+            <div class="tbar-dot red"></div>
+            <div class="tbar-dot yellow"></div>
+            <div class="tbar-dot green"></div>
+          </div>
+          <div class="tbar-title">bash — muaves</div>
+        </div>
+        <div class="terminal-body" id="hero-terminal"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="commands">
+  <section class="scroll-fade">
+    <div class="section-label">commands</div>
+    <div class="section-title">Everything you need,<br>one flag away.</div>
+    <p class="section-sub">Simple, memorable flags. No man page required.</p>
+    <div class="commands-grid">
+      <div class="cmd-card">
+        <div class="cmd-code">muaves</div>
+        <div class="cmd-desc">Show the help message and available commands</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves -oA</div>
+        <div class="cmd-desc">Display the "About Me" section with bio and info</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves -oP</div>
+        <div class="cmd-desc">List all projects with descriptions and links</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves -oH</div>
+        <div class="cmd-desc">Show help — same as running with no args</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves -OW</div>
+        <div class="cmd-desc">Open muaves.com in your default browser</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves -H:l</div>
+        <div class="cmd-desc">Show links and pick one to open interactively</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves --version</div>
+        <div class="cmd-desc">Print the current installed version</div>
+      </div>
+      <div class="cmd-card">
+        <div class="cmd-code">muaves --v</div>
+        <div class="cmd-desc">Shorthand for --version</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="install-section" id="install">
+  <section class="scroll-fade">
+    <div class="section-label">installation</div>
+    <div class="section-title">Up and running<br>in seconds.</div>
+    <p class="section-sub">Requires Python 3.6+. No external dependencies.</p>
+    <div class="install-grid">
+      <div class="install-card">
+        <div class="install-card-header">
+          <span>🪟</span> Windows
+        </div>
+        <div class="install-card-body">
+          <div class="install-step">
+            <div class="step-num">1</div>
+            <div class="step-text">Download and extract the ZIP file</div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">2</div>
+            <div class="step-text">Open Command Prompt or PowerShell</div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">3</div>
+            <div class="step-text">Navigate to the <code>windows</code> folder and run <code>muaves.bat</code></div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">4</div>
+            <div class="step-text">To use from anywhere, run <code>install.bat</code></div>
+          </div>
+          <div class="code-block"><span class="comment"># After install</span>
+<span class="cmd">muaves -oA</span></div>
+        </div>
+      </div>
+      <div class="install-card">
+        <div class="install-card-header">
+          <span>🐧</span> Linux / macOS
+        </div>
+        <div class="install-card-body">
+          <div class="install-step">
+            <div class="step-num">1</div>
+            <div class="step-text">Download and extract the ZIP file</div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">2</div>
+            <div class="step-text">Open a terminal and navigate to the <code>linux</code> folder</div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">3</div>
+            <div class="step-text">Run <code>./muaves</code> to launch</div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">4</div>
+            <div class="step-text">To use from anywhere, run <code>./install.sh</code></div>
+          </div>
+          <div class="code-block"><span class="comment"># After install</span>
+<span class="cmd">muaves -oP</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="try">
+  <section class="scroll-fade">
+    <div class="section-label">live demo</div>
+    <div class="section-title">Try it right here.</div>
+    <p class="section-sub">Type any muaves command below. Powered by the live API.</p>
+    <div style="margin-top:40px">
+      <div class="interactive-terminal">
+        <div class="terminal-bar">
+          <div class="tbar-dots">
+            <div class="tbar-dot red"></div>
+            <div class="tbar-dot yellow"></div>
+            <div class="tbar-dot green"></div>
+          </div>
+          <div class="tbar-title">interactive — muaves terminal</div>
+        </div>
+        <div class="terminal-body" id="live-output">
+          <div class="t-output t-muted" style="margin-bottom:8px">Welcome to the muaves interactive terminal.</div>
+          <div class="t-output t-muted">Type a command and press Enter or click Run.</div>
+          <div class="t-blank"></div>
+        </div>
+        <div class="t-input-row">
+          <span class="t-prompt t-green">❯</span>
+          <input class="t-input" id="t-input" type="text" placeholder="muaves -oA" autocomplete="off" spellcheck="false">
+          <button class="t-submit" onclick="runCmd()">Run</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="dl-section scroll-fade" id="download">
+  <div class="dl-inner">
+    <div class="version-badge">● v1.0.6 — latest stable</div>
+    <div class="section-title" style="font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:800;letter-spacing:-0.02em">Download muavescli</div>
+    <p style="color:var(--muted);font-size:14px;margin-top:12px">Requires Python 3.6+. Works on Windows, Linux, and macOS.</p>
+
+    <div class="stats-row" style="margin-top:40px">
+      <div class="stat">
+        <div class="stat-num" id="stat-stars">6</div>
+        <div class="stat-label">GitHub Stars</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1.0.6</div>
+        <div class="stat-label">Latest Version</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">29</div>
+        <div class="stat-label">Commits</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Dependencies</div>
+      </div>
+    </div>
+
+    <div class="dl-btns">
+      <a href="https://github.com/Muaves/muavescli/releases/download/v1.0.6/muaves-portfolio-v1.0.6.zip" download>
+        <div class="dl-btn">
+          <span class="os-icon">🪟</span>
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-weight:400">Download for</div>
+            <div>Windows</div>
+          </div>
+          <span class="arrow">→</span>
+        </div>
+      </a>
+      <a href="https://github.com/Muaves/muavescli/releases/download/v1.0.6/muaves-portfolio-v1.0.6.zip" download>
+        <div class="dl-btn">
+          <span class="os-icon">🐧</span>
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-weight:400">Download for</div>
+            <div>Linux / macOS</div>
+          </div>
+          <span class="arrow">→</span>
+        </div>
+      </a>
+      <a href="https://github.com/Muaves/muavescli/releases" target="_blank">
+        <div class="dl-btn">
+          <span class="os-icon">📦</span>
+          <div>
+            <div style="font-size:11px;color:var(--muted);font-weight:400">All releases on</div>
+            <div>GitHub</div>
+          </div>
+          <span class="arrow">→</span>
+        </div>
+      </a>
+    </div>
+    <p style="font-size:12px;color:var(--muted2);margin-top:20px">
+      By downloading, you agree to the <a href="https://github.com/Muaves/muavescli/blob/main/LICENSE" target="_blank" style="color:var(--muted);border-bottom:1px solid var(--border2)">license</a>.
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-brand">muavescli</div>
+  <div class="footer-links">
+    <a href="https://muaves.com" target="_blank">muaves.com</a>
+    <a href="https://github.com/Muaves" target="_blank">GitHub</a>
+    <a href="https://github.com/Muaves/muavescli/blob/main/LICENSE" target="_blank">License</a>
+    <a href="https://github.com/Muaves/muavescli/releases" target="_blank">Releases</a>
+  </div>
+  <div style="color:var(--muted2)">Made by Muaves</div>
+</footer>
+
+<script>
+const heroLines = [
+  {type:'prompt',text:'muaves -oA'},
+  {type:'blank'},
+  {type:'output',text:'  ╔══════════════════════════════════╗',cls:'t-muted'},
+  {type:'output',text:'  ║        About Muaves              ║',cls:'t-muted'},
+  {type:'output',text:'  ╚══════════════════════════════════╝',cls:'t-muted'},
+  {type:'blank'},
+  {type:'output',text:'  Name    › Muaves',cls:'t-cyan'},
+  {type:'output',text:'  Site    › muaves.com',cls:'t-cyan'},
+  {type:'output',text:'  GitHub  › github.com/muaves',cls:'t-cyan'},
+  {type:'blank'},
+  {type:'output',text:'  Loading from core.muaves.com...',cls:'t-muted'},
+  {type:'blank'},
+  {type:'prompt',text:'muaves --version'},
+  {type:'blank'},
+  {type:'output',text:'  muavescli v1.0.6',cls:'t-green'},
+  {type:'blank'},
+  {type:'cursor'},
+];
+
+async function typeHeroTerminal(){
+  const el=document.getElementById('hero-terminal');
+  for(const l of heroLines){
+    await new Promise(r=>setTimeout(r,l.type==='prompt'?120:l.type==='blank'?60:40));
+    if(l.type==='blank'){const d=document.createElement('div');d.className='t-blank';el.appendChild(d)}
+    else if(l.type==='cursor'){const d=document.createElement('div');d.innerHTML='<span class="t-line"><span class="t-prompt t-green">❯</span> <span class="cursor"></span></span>';el.appendChild(d)}
+    else if(l.type==='prompt'){
+      const d=document.createElement('div');
+      d.className='t-line';
+      d.innerHTML=`<span class="t-prompt t-green">❯</span> `;
+      el.appendChild(d);
+      const span=document.createElement('span');
+      span.className='t-cmd';
+      d.appendChild(span);
+      for(const ch of l.text){
+        await new Promise(r=>setTimeout(r,38));
+        span.textContent+=ch;
+      }
+    } else {
+      const d=document.createElement('div');
+      d.className='t-output '+(l.cls||'');
+      d.textContent=l.text;
+      el.appendChild(d);
+    }
+  }
+}
+typeHeroTerminal();
+
+const API='https://core.muaves.com/api';
+const cmdMap={
+  'muaves':'help',
+  'muaves -oh':'help',
+  'muaves -oa':'about',
+  'muaves -op':'projects',
+  'muaves -ow':'',
+  'muaves -h:l':'links',
+  'muaves --version':'stats',
+  'muaves --v':'stats',
+};
+
+function addLine(container,html,cls=''){
+  const d=document.createElement('div');
+  d.className='t-output '+(cls);
+  d.innerHTML=html;
+  container.appendChild(d);
+  container.scrollTop=container.scrollHeight;
+}
+function addBlank(container){
+  const d=document.createElement('div');d.className='t-blank';
+  container.appendChild(d);container.scrollTop=container.scrollHeight;
+}
+
+async function runCmd(){
+  const input=document.getElementById('t-input');
+  const out=document.getElementById('live-output');
+  const raw=input.value.trim();
+  if(!raw)return;
+  const key=raw.toLowerCase();
+  input.value='';
+
+  const promptDiv=document.createElement('div');
+  promptDiv.className='t-line';
+  promptDiv.innerHTML=`<span class="t-prompt t-green">❯</span> <span class="t-cmd">${raw}</span>`;
+  out.appendChild(promptDiv);
+  addBlank(out);
+
+  if(key==='muaves -ow'){
+    addLine(out,'  Opening muaves.com in your browser...','t-muted');
+    window.open('https://muaves.com','_blank');
+    addBlank(out);
+    return;
+  }
+
+  const endpoint=cmdMap[key];
+  if(endpoint===undefined){
+    addLine(out,`  Unknown command: <span class="t-yellow">${raw}</span>`,'');
+    addLine(out,'  Try: muaves, muaves -oA, muaves -oP, muaves -H:l, muaves --version','t-muted');
+    addBlank(out);
+    return;
+  }
+
+  addLine(out,'  Fetching from core.muaves.com...','t-muted');
+
+  try{
+    const url=endpoint?`${API}/${endpoint}`:API;
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    out.lastChild.remove();
+    addBlank(out);
+    renderData(out,endpoint,data);
+  } catch(e){
+    out.lastChild.remove();
+    addBlank(out);
+    renderFallback(out,endpoint,raw);
+  }
+}
+
+function renderData(out,endpoint,data){
+  if(endpoint==='about'||endpoint==='help'||endpoint==='stats'||endpoint==='links'||endpoint==='projects'){
+    const lines=formatData(endpoint,data);
+    for(const l of lines)addLine(out,l.text,l.cls||'');
+    addBlank(out);
+  } else {
+    addLine(out,JSON.stringify(data,null,2),'t-muted');
+    addBlank(out);
+  }
+}
+
+function formatData(endpoint,data){
+  const lines=[];
+  if(endpoint==='about'){
+    lines.push({text:'  ╔══════════════════════════════════╗',cls:'t-muted'});
+    lines.push({text:'  ║         About Me                 ║',cls:'t-muted'});
+    lines.push({text:'  ╚══════════════════════════════════╝',cls:'t-muted'});
+    lines.push({text:''});
+    const d=data;
+    if(d.name)lines.push({text:`  <span class="t-accent">Name</span>    › ${d.name}`,cls:''});
+    if(d.bio||d.description)lines.push({text:`  <span class="t-accent">Bio</span>     › ${d.bio||d.description}`,cls:''});
+    if(d.website||d.site)lines.push({text:`  <span class="t-accent">Site</span>    › ${d.website||d.site}`,cls:'t-cyan'});
+    if(d.github)lines.push({text:`  <span class="t-accent">GitHub</span>  › ${d.github}`,cls:'t-cyan'});
+    Object.keys(d).forEach(k=>{
+      if(!['name','bio','description','website','site','github'].includes(k)&&typeof d[k]==='string'){
+        lines.push({text:`  <span class="t-accent">${k}</span>  › ${d[k]}`,cls:''});
+      }
+    });
+  } else if(endpoint==='projects'){
+    lines.push({text:'  Projects',cls:'t-cyan'});
+    lines.push({text:''});
+    const arr=Array.isArray(data)?data:(data.projects||[data]);
+    arr.forEach((p,i)=>{
+      lines.push({text:`  ${i+1}. <span class="t-green">${p.name||p.title||'Project'}</span>`,cls:''});
+      if(p.description||p.desc)lines.push({text:`     ${p.description||p.desc}`,cls:'t-muted'});
+      if(p.url||p.link)lines.push({text:`     <span class="t-cyan">${p.url||p.link}</span>`,cls:''});
+      lines.push({text:''});
+    });
+  } else if(endpoint==='links'){
+    lines.push({text:'  Links',cls:'t-cyan'});
+    lines.push({text:''});
+    const arr=Array.isArray(data)?data:(data.links||[]);
+    arr.forEach((l,i)=>{
+      const name=l.name||l.label||l.title||Object.keys(l)[0];
+      const url=l.url||l.href||l.link||Object.values(l)[0];
+      lines.push({text:`  ${i+1}. <span class="t-accent">${name}</span>  <span class="t-muted">→</span> <span class="t-cyan">${url}</span>`,cls:''});
+    });
+  } else if(endpoint==='stats'||endpoint==='help'){
+    const keys=Object.keys(data);
+    keys.forEach(k=>{
+      const v=data[k];
+      lines.push({text:`  <span class="t-accent">${k}</span>  › ${typeof v==='object'?JSON.stringify(v):v}`,cls:''});
+    });
+  }
+  return lines;
+}
+
+function renderFallback(out,endpoint,raw){
+  const fallbacks={
+    'help':[
+      {text:'  muavescli — portfolio in bash',cls:'t-green'},
+      {text:''},
+      {text:'  Usage: muaves [command]',cls:'t-muted'},
+      {text:''},
+      {text:'  <span class="t-accent">muaves</span>           Show this help',cls:''},
+      {text:'  <span class="t-accent">muaves -oA</span>       About Me',cls:''},
+      {text:'  <span class="t-accent">muaves -oP</span>       Projects',cls:''},
+      {text:'  <span class="t-accent">muaves -oH</span>       Help',cls:''},
+      {text:'  <span class="t-accent">muaves -OW</span>       Open website',cls:''},
+      {text:'  <span class="t-accent">muaves -H:l</span>      Links',cls:''},
+      {text:'  <span class="t-accent">muaves --version</span> Version',cls:''},
+    ],
+    'about':[
+      {text:'  ╔══════════════════════════════════╗',cls:'t-muted'},
+      {text:'  ║         About Muaves             ║',cls:'t-muted'},
+      {text:'  ╚══════════════════════════════════╝',cls:'t-muted'},
+      {text:''},
+      {text:'  <span class="t-accent">Name</span>    › Muaves',cls:''},
+      {text:'  <span class="t-accent">Site</span>    › muaves.com',cls:'t-cyan'},
+      {text:'  <span class="t-accent">GitHub</span>  › github.com/muaves',cls:'t-cyan'},
+    ],
+    'projects':[
+      {text:'  Projects — muaves',cls:'t-cyan'},
+      {text:''},
+      {text:'  1. <span class="t-green">muavescli</span>',cls:''},
+      {text:'     My portfolio but its in bash!',cls:'t-muted'},
+      {text:'     <span class="t-cyan">github.com/Muaves/muavescli</span>',cls:''},
+    ],
+    'links':[
+      {text:'  Links — muaves',cls:'t-cyan'},
+      {text:''},
+      {text:'  1. <span class="t-accent">Website</span>  → <span class="t-cyan">muaves.com</span>',cls:''},
+      {text:'  2. <span class="t-accent">GitHub</span>   → <span class="t-cyan">github.com/muaves</span>',cls:''},
+    ],
+    'stats':[
+      {text:'  muavescli <span class="t-green">v1.0.6</span>',cls:''},
+      {text:'  Made by Muaves',cls:'t-muted'},
+    ],
+  };
+  const lines=fallbacks[endpoint]||fallbacks['help'];
+  for(const l of lines)addLine(out,l.text,l.cls||'');
+  addBlank(out);
+}
+
+document.getElementById('t-input').addEventListener('keydown',e=>{if(e.key==='Enter')runCmd()});
+
+const fades=document.querySelectorAll('.scroll-fade');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:0.1});
+fades.forEach(el=>obs.observe(el));
+</script>
 </body>
 </html>
