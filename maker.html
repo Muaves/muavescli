@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Maker — muavescli</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="description" content="Create your own CLI portfolio with muavescli! This interactive generator helps you build a personalized command-line portfolio, showcasing your projects and links. Fill in your details, customize the design, and download a ready-to-use zip file to share your work in the terminal. Perfect for developers looking to make a unique impression with their CLI presence.">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0e0e0e;
+  color: #fffefe;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 28px 16px 80px;
+}
+
+#app {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+}
+.step-node {
+  width: 33px; height: 33px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  border: 1px solid #383838;
+  color: #dedede;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-node.active {
+  background: #6655ee;
+  border-color: #6655ee;
+  color: #fff;
+}
+.step-node.done {
+  background: #1c1a30;
+  border-color: #6655ee;
+  color: #8877dd;
+}
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: #272727;
+}
+.step-line.done { background: #6655ee; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #202020;
+}
+.page-header .made-by {
+  font-size: 11px;
+  color: #6655ee;
+  margin-bottom: 5px;
+  display: block;
+}
+.page-header .made-by a { color: #6655ee; text-decoration: none; }
+.page-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #d8d8d8;
+  margin-bottom: 5px;
+}
+.page-header p {
+  font-size: 13px;
+  color: #555;
+}
+
+.card {
+  background: #141414;
+  border: 1px solid #252525;
+  padding: 18px 16px;
+  margin-bottom: 12px;
+}
+.card h2 {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fffafa;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: 14px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #1e1e1e;
+}
+.card p { font-size: 13px; color: #484848; margin-bottom: 10px; }
+
+.field { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fffafab2;
+  margin-bottom: 5px;
+}
+.field label small { font-size: 11px; color: #404040; font-weight: 400; }
+
+.field input[type=text],
+.field textarea,
+.field select {
+  width: 100%;
+  background: #0e0e0e;
+  border: 1px solid #2c2c2c;
+  border-radius: 0;
+  color: #c4c4c4;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  resize: vertical;
+}
+.field input[type=text]:focus,
+.field textarea:focus,
+.field select:focus { border-color: #6655ee; }
+.field input::placeholder,
+.field textarea::placeholder { color: #323232; }
+.field select option { background: #141414; }
+
+.radio-group { display: flex; gap: 7px; flex-wrap: wrap; }
+.radio-group label {
+  display: flex; align-items: center; gap: 7px;
+  background: #0e0e0e;
+  border: 1px solid #2a2a2a;
+  padding: 7px 13px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #666;
+}
+.radio-group label:has(input:checked) {
+  border-color: #6655ee;
+  color: #aaa;
+  background: #18162a;
+}
+.radio-group input { accent-color: #6655ee; }
+
+.project-item, .link-item {
+  background: #111;
+  border: 1px solid #222;
+  border-left: 2px solid #6655ee;
+  padding: 12px;
+  margin-bottom: 9px;
+}
+.project-item h3, .link-item h3 {
+  font-size: 11px;
+  font-weight: 600;
+  color: #484848;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 11px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.btn-remove {
+  background: transparent;
+  border: 1px solid #3a2020;
+  color: #5a3030;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+.btn-remove:hover { color: #cc4444; border-color: #5a2020; }
+
+.btn-add {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed #282828;
+  color: #3e3e3e;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  padding: 8px;
+  cursor: pointer;
+  margin-top: 3px;
+}
+.btn-add:hover { border-color: #6655ee; color: #8877dd; }
+
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.btn-back {
+  background: transparent;
+  border: 1px solid #2a2a2a;
+  color: #4a4a4a;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  padding: 8px 17px;
+  cursor: pointer;
+}
+.btn-back:hover { color: #777; border-color: #444; }
+
+.btn-next, .btn-generate {
+  background: #6655ee;
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  padding: 8px 20px;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+.btn-next:hover, .btn-generate:hover { background: #7766ff; }
+
+.zip-preview {
+  background: #0a0a0a;
+  border: 1px solid #242424;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #6655ee;
+  margin-top: 7px;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+}
+
+.checkbox-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.checkbox-row input { accent-color: #6655ee; width: 14px; height: 14px; cursor: pointer; }
+#api-block { margin-top: 6px; }
+
+.done-box {
+  background: #141414;
+  border: 1px solid #252525;
+  border-top: 2px solid #6655ee;
+  padding: 30px 20px;
+  text-align: center;
+}
+.done-box h2 { font-size: 19px; font-weight: 600; color: #d4d4d4; margin-bottom: 5px; }
+.done-box .done-credit { font-size: 10px; color: #6655ee; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; display: block; }
+.done-box p { font-size: 13px; color: #555; margin-bottom: 16px; line-height: 1.65; }
+.done-box pre {
+  background: #0a0a0a;
+  border: 1px solid #1e1e1e;
+  padding: 12px;
+  font-size: 12px;
+  color: #5a5a5a;
+  text-align: left;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 18px;
+  font-family: 'Courier New', monospace;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div class="stepper">
+    <div class="step-node active" id="sn-1">1</div>
+    <div class="step-line" id="sl-1"></div>
+    <div class="step-node" id="sn-2">2</div>
+    <div class="step-line" id="sl-2"></div>
+    <div class="step-node" id="sn-3">3</div>
+    <div class="step-line" id="sl-3"></div>
+    <div class="step-node" id="sn-done">✓</div>
+  </div>
+
+  <div id="page-1" class="page active">
+    <div class="page-header">
+      <div class="made-by">Made by <a href="https://muaves.com" target="_blank">Muaves</a></div>
+      <h1>muavescli Portfolio Maker</h1>
+      <p>Fill in your details and get a ready-to-use CLI portfolio zip.</p>
+    </div>
+
+    <div class="card">
+      <h2>Your Operating System</h2>
+      <p>Which system will you run this on?</p>
+      <div class="radio-group">
+        <label><input type="radio" name="os" value="linux" checked> Linux / macOS</label>
+        <label><input type="radio" name="os" value="windows"> Windows</label>
+        <label><input type="radio" name="os" value="both"> Both</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>About You</h2>
+      <div class="field"><label>Your name *</label><input type="text" id="f-name" placeholder="e.g. Alex"></div>
+      <div class="field"><label>CLI command name * <small>(no spaces — this becomes the command)</small></label><input type="text" id="f-username" placeholder="e.g. alex"></div>
+      <div class="field"><label>Title / Role</label><input type="text" id="f-title" placeholder="e.g. Full Stack Developer"></div>
+      <div class="field"><label>Bio *</label><textarea id="f-bio" rows="3" placeholder="Tell people about yourself..."></textarea></div>
+      <div class="field"><label>Website URL</label><input type="text" id="f-website" placeholder="https://yoursite.com"></div>
+      <div class="field"><label>GitHub URL</label><input type="text" id="f-github" placeholder="https://github.com/yourusername"></div>
+      <div class="field"><label>Email</label><input type="text" id="f-email" placeholder="you@example.com"></div>
+      <div class="field"><label>Location</label><input type="text" id="f-location" placeholder="e.g. Berlin, Germany"></div>
+    </div>
+
+    <div class="nav-row">
+      <span></span>
+      <button class="btn-next" onclick="goTo(2)">Next →</button>
+    </div>
+  </div>
+
+  <div id="page-2" class="page">
+    <div class="page-header">
+      <div class="made-by">Made by <a href="https://muaves.com" target="_blank">Muaves</a></div>
+      <h1>Projects &amp; Links</h1>
+      <p>Add your work and social links.</p>
+    </div>
+
+    <div class="card">
+      <h2>Projects <small style="font-size:10px;color:#444;text-transform:none;letter-spacing:0">(max 10, at least 1)</small></h2>
+      <div id="projects-list"></div>
+      <button class="btn-add" onclick="addProject()">+ Add Project</button>
+    </div>
+
+    <div class="card">
+      <h2>Links</h2>
+      <div id="links-list"></div>
+      <button class="btn-add" onclick="addLink()">+ Add Link</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goTo(1)">← Back</button>
+      <button class="btn-next" onclick="goTo(3)">Next →</button>
+    </div>
+  </div>
+
+  <div id="page-3" class="page">
+    <div class="page-header">
+      <div class="made-by">Made by <a href="https://muaves.com" target="_blank">Muaves</a></div>
+      <h1>Customize &amp; Export</h1>
+      <p>Last step — tune your setup and download the zip.</p>
+    </div>
+
+    <div class="card">
+      <h2>Settings</h2>
+      <div class="field"><label>Version</label><input type="text" id="f-version" value="1.0.0" placeholder="1.0.0"></div>
+      <div class="field">
+        <label>Accent color <small>(ANSI terminal color)</small></label>
+        <select id="f-color">
+          <option value="36">Cyan</option>
+          <option value="32">Green</option>
+          <option value="34">Blue</option>
+          <option value="35">Magenta</option>
+          <option value="33">Yellow</option>
+          <option value="31">Red</option>
+          <option value="37">White</option>
+        </select>
+      </div>
+      <label class="checkbox-row"><input type="checkbox" id="f-show-api"> Fetch live data from an API URL</label>
+      <div id="api-block" style="display:none">
+        <div class="field"><label>API base URL</label><input type="text" id="f-api" placeholder="https://core.yoursite.com/api"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>File Name</h2>
+      <p>The zip name always includes <strong style="color:#4a3aff">-by-muaves</strong> — made by <a href="https://muaves.com" target="_blank" style="color:#4a3aff;text-decoration:none">Muaves</a>.</p>
+      <div class="field"><label>Your prefix</label><input type="text" id="f-zipname" placeholder="e.g. my-portfolio" oninput="updateZipPreview()"></div>
+      <div class="zip-preview" id="zip-preview-box">...</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" onclick="goTo(2)">← Back</button>
+      <button class="btn-generate" onclick="generate()">Generate &amp; Download ZIP</button>
+    </div>
+  </div>
+
+  <div id="page-done" class="page">
+    <div class="done-box">
+      <div class="done-credit">Made by Muaves — muaves.com</div>
+      <h2>Your portfolio is ready!</h2>
+      <p id="done-msg"></p>
+      <pre id="done-instructions"></pre>
+      <button class="btn-next" onclick="goTo(1); reset()">Make Another</button>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
