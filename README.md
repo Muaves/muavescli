@@ -1,4 +1,4 @@
-# Muaves Portfolio CLI v1.0.4
+# Muaves Portfolio CLI v1.0.6
 ![Issues](https://img.shields.io/github/issues/Muaves/muavescli?style=for-the-badge&color=800f2f)
 ![Commits](https://img.shields.io/github/commits-since/Muaves/muavescli/v1.0.4?style=for-the-badge&color=a4133c&label=COMMITS)
 ![Size](https://img.shields.io/github/repo-size/Muaves/muavescli?style=for-the-badge&color=c9184a&label=SIZE)
