@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "=================================="
 echo "  Muaves Portfolio CLI Installer"
@@ -6,6 +7,16 @@ echo "=================================="
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "Error: Python 3 is required but was not found in PATH." >&2
+    exit 1
+fi
+
+if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 6) else 1)'; then
+    echo "Error: Python 3.6 or newer is required." >&2
+    exit 1
+fi
 
 echo "Where would you like to install muaves?"
 echo ""
@@ -20,11 +31,9 @@ case $choice in
         INSTALL_DIR="$HOME/.local/bin"
         mkdir -p "$INSTALL_DIR"
         
-        cp "$SCRIPT_DIR/muaves" "$INSTALL_DIR/"
-        cp "$SCRIPT_DIR/muaves.py" "$INSTALL_DIR/"
-        cp "$SCRIPT_DIR/portfolio_data.json" "$INSTALL_DIR/"
-        
-        chmod +x "$INSTALL_DIR/muaves"
+        install -m 755 "$SCRIPT_DIR/muaves" "$INSTALL_DIR/muaves"
+        install -m 644 "$SCRIPT_DIR/muaves.py" "$INSTALL_DIR/muaves.py"
+        install -m 644 "$SCRIPT_DIR/portfolio_data.json" "$INSTALL_DIR/portfolio_data.json"
         
         echo ""
         echo "✓ Installed to $INSTALL_DIR"
@@ -50,10 +59,9 @@ case $choice in
         echo ""
         echo "Installing to $INSTALL_DIR (requires sudo)..."
         
-        sudo cp "$SCRIPT_DIR/muaves" "$INSTALL_DIR/"
-        sudo cp "$SCRIPT_DIR/muaves.py" "$INSTALL_DIR/"
-        sudo cp "$SCRIPT_DIR/portfolio_data.json" "$INSTALL_DIR/"
-        sudo chmod +x "$INSTALL_DIR/muaves"
+        sudo install -m 755 "$SCRIPT_DIR/muaves" "$INSTALL_DIR/muaves"
+        sudo install -m 644 "$SCRIPT_DIR/muaves.py" "$INSTALL_DIR/muaves.py"
+        sudo install -m 644 "$SCRIPT_DIR/portfolio_data.json" "$INSTALL_DIR/portfolio_data.json"
         
         echo ""
         echo "✓ Installed system-wide!"

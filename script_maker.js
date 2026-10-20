@@ -357,12 +357,21 @@ python3 "$SCRIPT_DIR/portfolio.py" "$@"
 
 function buildLinuxInstaller(cmd) {
   return `#!/usr/bin/env bash
+set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Error: Python 3 is required but was not found in PATH." >&2
+  exit 1
+fi
+if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 6) else 1)'; then
+  echo "Error: Python 3.6 or newer is required." >&2
+  exit 1
+fi
 echo "Installing ${cmd}..."
 INSTALL_DIR="$HOME/.local/bin"
 mkdir -p "$INSTALL_DIR"
-cp "$SCRIPT_DIR/portfolio.py" "$INSTALL_DIR/${cmd}.py"
-cp "$SCRIPT_DIR/portfolio_data.json" "$INSTALL_DIR/portfolio_data.json"
+install -m 644 "$SCRIPT_DIR/portfolio.py" "$INSTALL_DIR/${cmd}.py"
+install -m 644 "$SCRIPT_DIR/portfolio_data.json" "$INSTALL_DIR/portfolio_data.json"
 cat > "$INSTALL_DIR/${cmd}" << LAUNCHER
 #!/usr/bin/env bash
 python3 "$INSTALL_DIR/${cmd}.py" "\\$@"
@@ -387,25 +396,53 @@ python "%SCRIPT_DIR%portfolio.py" %*
 
 function buildWindowsInstaller(cmd) {
   return `@echo off
+setlocal
 echo Installing ${cmd}...
 echo.
 echo This installer sets up ${cmd} to be used from anywhere.
 echo.
+where python >nul 2>nul
+if errorlevel 1 (
+  echo Error: Python was not found in PATH. Install Python 3 and try again.
+  pause
+  exit /b 1
+)
 set "INSTALL_DIR=%USERPROFILE%\\${cmd}-portfolio"
-mkdir "%INSTALL_DIR%" 2>nul
+if not exist "%INSTALL_DIR%" mkdir "%INSTALL_DIR%"
+if errorlevel 1 goto install_failed
 copy /Y "%~dp0portfolio.py" "%INSTALL_DIR%\\portfolio.py" >nul
+if errorlevel 1 goto install_failed
 copy /Y "%~dp0portfolio_data.json" "%INSTALL_DIR%\\portfolio_data.json" >nul
+if errorlevel 1 goto install_failed
 (
   echo @echo off
   echo python "%INSTALL_DIR%\\portfolio.py" %%*
 ) > "%INSTALL_DIR%\\${cmd}.bat"
-setx PATH "%PATH%;%INSTALL_DIR%" >nul 2>&1
+if errorlevel 1 goto install_failed
+powershell -NoProfile -Command "$p=[Environment]::GetEnvironmentVariable('Path','User'); if (!$p) {$p=''}; $d=$env:INSTALL_DIR; if (($p -split ';') -notcontains $d) { [Environment]::SetEnvironmentVariable('Path', (($p.TrimEnd(';') + ';' + $d).Trim(';')), 'User') }"
+if errorlevel 1 goto path_warning
 echo.
 echo Installed! Restart your terminal and run: ${cmd}
 echo.
 echo Portfolio made with muavescli by Muaves -- muaves.com
 echo.
 pause
+exit /b 0
+
+:path_warning
+echo.
+echo Files installed, but the user PATH could not be updated automatically.
+echo Add this folder to PATH manually: %INSTALL_DIR%
+echo.
+pause
+exit /b 0
+
+:install_failed
+echo.
+echo Installation failed. Check that the files are present and writable.
+echo.
+pause
+exit /b 1
 `;
 }
 

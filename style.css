@@ -1,0 +1,17 @@
+body {
+    background: white;
+    color: black;
+}
+
+center {
+    text-align: center;
+}
+
+hr {
+    display: block;
+    margin: 0.5em auto;
+}
+
+br {
+    display: block;
+}
